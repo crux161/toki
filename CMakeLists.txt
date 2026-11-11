@@ -51,7 +51,8 @@ target_include_directories(chai PRIVATE vendor/chaitea/vendor_win)
 # being a static library, propagates the macOS frameworks it needs.
 add_executable(toki
 	src/toki.c
-	src/FrameBuffer.c)
+	src/FrameBuffer.c
+	src/Glyphs.c)
 target_compile_features(toki PRIVATE c_std_11)
 set_target_properties(toki PROPERTIES C_EXTENSIONS OFF)
 target_link_libraries(toki PRIVATE minifb::minifb)
@@ -66,3 +67,8 @@ add_executable(toki-term
 target_compile_features(toki-term PRIVATE c_std_11)
 set_target_properties(toki-term PROPERTIES C_EXTENSIONS OFF)
 target_link_libraries(toki-term PRIVATE chai::chai)
+
+# The warnings the Makefile has always used for src/. Vendored code keeps its
+# own flags, so these stay off the chai and minifb targets.
+target_compile_options(toki PRIVATE -Wall -Wextra)
+target_compile_options(toki-term PRIVATE -Wall -Wextra)

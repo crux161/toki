@@ -4,3 +4,4 @@ build
 cmake-build/
 .qwen/
 SEED.md
+theme_proposal.md
