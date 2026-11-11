@@ -1,0 +1,3 @@
+[submodule "vendor/chaitea"]
+	path = vendor/chaitea
+	url = https://git.sr.ht/~lattay/chaitea
