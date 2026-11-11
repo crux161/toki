@@ -1,3 +1,6 @@
 [submodule "vendor/chaitea"]
 	path = vendor/chaitea
 	url = https://git.sr.ht/~lattay/chaitea
+[submodule "vendor/minifb"]
+	path = vendor/minifb
+	url = https://github.com/emoon/minifb.git

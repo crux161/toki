@@ -1,0 +1,22 @@
+layout {
+    default_tab_template {
+        children
+        pane size=1 borderless=true {
+            plugin location="zellij:status-bar"
+        }
+    }
+
+    tab name="toki-workspace" {
+        // Background tiled workspace (e.g. nvim taking up the whole screen)
+        pane size="100%" focus=true {
+            command "nvim"
+        }
+
+        // Floating overlay specifically sized for your clock canvas
+        floating_panes {
+            pane x="center" y="center" width=360 height=72 command="./build/toki" {
+                borderless true
+            }
+        }
+    }
+}

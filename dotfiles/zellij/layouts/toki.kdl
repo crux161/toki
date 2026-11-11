@@ -1,0 +1,88 @@
+layout {
+    default_tab_template {
+        children
+        pane size=1 borderless=true {
+            plugin location="zellij:status-bar"
+        }
+    }
+
+    tab name="toki-workspace" {
+        pane split_direction="vertical" {
+            // Main editor pane on the left
+            pane size="70%" focus=true {
+                command "nvim"
+            }
+
+            // Right-side stack split horizontally
+            pane size="30%" split_direction="horizontal" {
+                pane size="50%" {
+                    // Secondary tool, logs, or shell pane
+                }
+                
+                // toki clock pane running your binary
+                pane size="50%" command="./build/toki" {
+                    // Optional: pass arguments if needed
+                    // args "--font" "resources/fonts/Tmplr.flf"
+                }
+            }
+        }
+    }
+}layout {
+    default_tab_template {
+        children
+        pane size=1 borderless=true {
+            plugin location="zellij:status-bar"
+        }
+    }
+
+    tab name="toki-workspace" {
+        pane split_direction="vertical" {
+            // Main editor pane on the left
+            pane size="70%" focus=true {
+                command "nvim"
+            }
+
+            // Right-side stack split horizontally
+            pane size="30%" split_direction="horizontal" {
+                pane size="50%" {
+                    // Secondary tool, logs, or shell pane
+                }
+                
+                // toki clock pane running your binary
+                pane size="50%" command="./build/toki" {
+                    // Optional: pass arguments if needed
+                    // args "--font" "resources/fonts/Tmplr.flf"
+                }
+            }
+        }
+    }
+}layout {
+    default_tab_template {
+        children
+        pane size=1 borderless=true {
+            plugin location="zellij:status-bar"
+        }
+    }
+
+    tab name="toki-workspace" {
+        pane split_direction="vertical" {
+            // Main editor pane on the left
+            pane size="70%" focus=true {
+                command "nvim"
+            }
+
+            // Right-side stack split horizontally
+            pane size="30%" split_direction="horizontal" {
+                pane size="50%" {
+                    // Secondary tool, logs, or shell pane
+                }
+                
+                // toki clock pane running your binary
+                pane size="50%" command="./build/toki" {
+                    // Optional: pass arguments if needed
+                    // args "--font" "resources/fonts/Tmplr.flf"
+                }
+            }
+        }
+    }
+}
