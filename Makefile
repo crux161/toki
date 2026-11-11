@@ -2,15 +2,26 @@ CC = clang
 CXX = clang++
 CFLAGS = -Wall -Wextra -std=c11 -O3 -D_POSIX_C_SOURCE=200809L -Ivendor/chaitea/src -Ivendor/chaitea/vendor_win $(MINIFB_INCLUDES)
 LDFLAGS = -Lvendor/chaitea/bin -L$(BUILD_DIR)
-LIBS = -lchai -lminifb -lc++ $(MINIFB_FRAMEWORKS)
 
+# CMakeLists.txt is the primary build now; this Makefile is kept building the
+# same two targets during the transition.
 TARGET = toki
+TERM_TARGET = toki-term
 SRC_DIR = src
 BUILD_DIR = build
 OBJ_DIR = $(BUILD_DIR)/obj
 
-SRCS = $(SRC_DIR)/toki.c
+# The windowed clock. -lc++ is needed even though src/ is C: every minifb
+# backend calls release_cpp_stub(), defined only in MiniFB_cpp.cpp.
+SRCS = $(SRC_DIR)/toki.c $(SRC_DIR)/FrameBuffer.c
 OBJS = $(SRCS:$(SRC_DIR)/%.c=$(OBJ_DIR)/%.o)
+LIBS = -lminifb -lc++ $(MINIFB_FRAMEWORKS)
+
+# The original terminal clock.
+TERM_SRCS = $(SRC_DIR)/toki_term.c
+TERM_OBJS = $(TERM_SRCS:$(SRC_DIR)/%.c=$(OBJ_DIR)/%.o)
+TERM_LIBS = -lchai
+
 LIB_CHAI = vendor/chaitea/bin/libchai.a
 
 # minifb, macOS Metal backend. Kept out of $(OBJ_DIR) so these pattern rules
@@ -48,15 +59,19 @@ MINIFB_OBJS = $(MINIFB_C_SRCS:%.c=$(MINIFB_OBJ_DIR)/%.o) \
 	$(MINIFB_M_SRCS:%.m=$(MINIFB_OBJ_DIR)/%.o)
 
 # Default target is now 'all'
-all: $(BUILD_DIR)/$(TARGET)
+all: $(BUILD_DIR)/$(TARGET) $(BUILD_DIR)/$(TERM_TARGET)
 
 # Automatically build the chaitea submodule library if it doesn't exist
 $(LIB_CHAI):
 	$(MAKE) -C vendor/chaitea CFLAGS="-std=gnu11 -Wall -Wextra -Wpedantic -D_POSIX_C_SOURCE=200809L -Ivendor_win"
 
-# Link the final binary, ensuring libchai.a and libminifb.a are built first
-$(BUILD_DIR)/$(TARGET): $(OBJS) $(LIB_CHAI) $(LIB_MINIFB) | $(BUILD_DIR)
+# Link the windowed clock, ensuring libminifb.a is built first
+$(BUILD_DIR)/$(TARGET): $(OBJS) $(LIB_MINIFB) | $(BUILD_DIR)
 	$(CC) $(OBJS) $(LDFLAGS) $(LIBS) -o $@
+
+# Link the terminal clock, ensuring libchai.a is built first
+$(BUILD_DIR)/$(TERM_TARGET): $(TERM_OBJS) $(LIB_CHAI) | $(BUILD_DIR)
+	$(CC) $(TERM_OBJS) $(LDFLAGS) $(TERM_LIBS) -o $@
 
 # Compile minifb's C, C++ and Objective-C sources into object files
 $(MINIFB_OBJ_DIR)/%.o: $(MINIFB_DIR)/src/%.c
