@@ -53,7 +53,8 @@ add_executable(toki
 	src/toki.c
 	src/Config.c
 	src/FrameBuffer.c
-	src/Glyphs.c)
+	src/Glyphs.c
+	src/KittyRender.c)
 target_compile_features(toki PRIVATE c_std_11)
 set_target_properties(toki PROPERTIES C_EXTENSIONS OFF)
 target_link_libraries(toki PRIVATE minifb::minifb)
