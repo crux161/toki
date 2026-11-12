@@ -79,3 +79,44 @@ void blit_glyph(FrameBuffer *fb, int glyph, int x, int y, uint32_t fg_color, int
         }
     }
 }
+
+#define SCANLINE_DIM      0.85f // odd rows lose 15% of their luminance
+#define VIGNETTE_STRENGTH 0.25f // corners fall to 50% brightness
+
+void apply_effects(FrameBuffer *fb, bool scanlines, bool vignette) {
+    if (!scanlines && !vignette) {
+        return;
+    }
+
+    const float centre_x = fb->width * 0.5f;
+    const float centre_y = fb->height * 0.5f;
+
+    for (uint32_t y = 0; y < fb->height; y++) {
+        float row_factor = (scanlines && (y % 2) != 0) ? SCANLINE_DIM : 1.0f;
+        // The vignette's vertical term depends only on the row, so hoist it.
+        float dy = vignette ? ((float) y - centre_y) / centre_y : 0.0f;
+
+        for (uint32_t x = 0; x < fb->width; x++) {
+            float factor = row_factor;
+
+            if (vignette) {
+                float dx = ((float) x - centre_x) / centre_x;
+                float weight = 1.0f - (dx * dx + dy * dy) * VIGNETTE_STRENGTH;
+                factor *= (weight > 0.0f) ? weight : 0.0f;
+            }
+
+            if (factor >= 1.0f) {
+                continue; // nothing to dim, which skips every even row wholesale
+            }
+
+            // MFB_GET_* and MFB_RGB rather than the fixed 16/8/0 shifts in
+            // theme_proposal.md: those shifts are right on desktop, where pixels
+            // are 0xAARRGGBB, but wrong on Android, and they also drop alpha.
+            size_t idx = (size_t) y * fb->width + x;
+            uint32_t color = fb->pixels[idx];
+            fb->pixels[idx] = MFB_RGB((uint32_t) (MFB_GET_R(color) * factor),
+                                      (uint32_t) (MFB_GET_G(color) * factor),
+                                      (uint32_t) (MFB_GET_B(color) * factor));
+        }
+    }
+}

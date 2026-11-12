@@ -51,6 +51,7 @@ target_include_directories(chai PRIVATE vendor/chaitea/vendor_win)
 # being a static library, propagates the macOS frameworks it needs.
 add_executable(toki
 	src/toki.c
+	src/Config.c
 	src/FrameBuffer.c
 	src/Glyphs.c)
 target_compile_features(toki PRIVATE c_std_11)

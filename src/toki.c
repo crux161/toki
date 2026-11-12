@@ -17,15 +17,11 @@
 #include <stdlib.h>
 #include <time.h>
 
+#include "Config.h"
 #include "FrameBuffer.h"
 #include "Glyphs.h"
 
 #define VERSION "1.3.0"
-
-// SEED.md calls for a 0x00101010 background and green glyphs. MFB_RGB builds
-// both without relying on the raw byte order of a hex literal.
-#define BACKGROUND_COLOR MFB_RGB(0x10, 0x10, 0x10)
-#define FOREGROUND_COLOR MFB_RGB(0x00, 0xff, 0x00)
 
 static void print_help(const char *prog_name) {
 	fprintf(stderr, "Usage: %s [OPTION]...\n", prog_name);
@@ -55,7 +51,7 @@ static int parse_scale(const char *text) {
 }
 
 // Draws HH:MM in 24-hour time as five bundled glyphs, each centred in its cell.
-static void render_clock(FrameBuffer *fb, int scale) {
+static void render_clock(FrameBuffer *fb, int scale, uint32_t fg_color) {
 	time_t now = time(NULL);
 	struct tm tm_info;
 	localtime_r(&now, &tm_info);
@@ -71,7 +67,7 @@ static void render_clock(FrameBuffer *fb, int scale) {
 	for (int i = 0; i < CLOCK_CELLS; i++) {
 		int glyph = (face[i] == ':') ? GLYPH_SEPARATOR : face[i] - '0';
 		int glyph_x = i * cell + (cell - glyph_width) / 2;
-		blit_glyph(fb, glyph, glyph_x, glyph_y, FOREGROUND_COLOR, scale);
+		blit_glyph(fb, glyph, glyph_x, glyph_y, fg_color, scale);
 	}
 }
 
@@ -106,6 +102,11 @@ int main(int argc, char **argv) {
 		}
 	}
 
+	// No config file is not an error: the defaults stay in place.
+	Config config;
+	config_default(&config);
+	config_load(&config);
+
 	const unsigned width = BASE_WINDOW_WIDTH / scale;
 	const unsigned height = BASE_WINDOW_HEIGHT / scale;
 
@@ -125,8 +126,9 @@ int main(int argc, char **argv) {
 	mfb_set_target_fps(60);
 
 	while (true) {
-		clear_framebuffer(&fb, BACKGROUND_COLOR);
-		render_clock(&fb, scale);
+		clear_framebuffer(&fb, config.background);
+		render_clock(&fb, scale, config.foreground);
+		apply_effects(&fb, config.scanlines, config.vignette);
 
 		mfb_update_state state = mfb_update_ex(window, fb.pixels, fb.width, fb.height);
 		if (state != MFB_STATE_OK) {
