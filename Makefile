@@ -1,6 +1,6 @@
 CC = clang
 CXX = clang++
-CFLAGS = -Wall -Wextra -std=c11 -O3 -D_POSIX_C_SOURCE=200809L -Ivendor/chaitea/src -Ivendor/chaitea/vendor_win $(MINIFB_INCLUDES)
+CFLAGS = -Wall -Wextra -std=c11 -O3 -D_POSIX_C_SOURCE=200809L -Ivendor/chaitea/src -Ivendor/chaitea/vendor_win $(MINIFB_INCLUDES) -static
 LDFLAGS = -Lvendor/chaitea/bin -L$(BUILD_DIR)
 
 # CMakeLists.txt is the primary build now; this Makefile is kept building the
